@@ -57,17 +57,7 @@ async def start(name, user, wait_time, meetingcode, passcode):
         print(f"{name} ended!")
 
         await browser.close()
-import argparse
-import asyncio
-from concurrent.futures import ThreadPoolExecutor
 
-# Your start() function and other necessary code here...
-
-import argparse
-import asyncio
-from concurrent.futures import ThreadPoolExecutor
-
-# Your start() function and other necessary code here...
 
 async def main():
     global running
