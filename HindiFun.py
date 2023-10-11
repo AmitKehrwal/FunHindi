@@ -61,9 +61,9 @@ async def start(name, user, wait_time, meetingcode, passcode):
 def main():
     global running
     parser = argparse.ArgumentParser()
-    parser.add_argument("--users", type=int, help="Number of Users")
-    parser.add_argument("--meetingcode", type=str, help="Meeting Code (No Space)")
-    parser.add_argument("--passcode", type=str, help="Password (No Space)")
+    parser.add_argument("--users", type=int, help="5")
+    parser.add_argument("--meetingcode", type=str, help="82770760919")
+    parser.add_argument("--passcode", type=str, help="468111")
 
     args = parser.parse_args()
 
