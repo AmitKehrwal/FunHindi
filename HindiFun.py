@@ -63,12 +63,18 @@ from concurrent.futures import ThreadPoolExecutor
 
 # Your start() function and other necessary code here...
 
+import argparse
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
+
+# Your start() function and other necessary code here...
+
 def main():
     global running
     parser = argparse.ArgumentParser()
-    parser.add_argument("--users", type=int, help="5")
-    parser.add_argument("--meetingcode", type=str, help="82770760919")
-    parser.add_argument("--passcode", type=str, help="468111)")
+    parser.add_argument("5", type=int, help="Number of Users")
+    parser.add_argument("82770760919", type=str, help="Meeting Code (No Space)")
+    parser.add_argument("468111", type=str, help="Password (No Space)")
 
     args = parser.parse_args()
 
