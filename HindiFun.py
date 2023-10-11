@@ -59,38 +59,5 @@ async def start(name, user, wait_time, meetingcode, passcode):
         await browser.close()
 
 
-async def main():
-    global running
-    number = int(input("Enter number of Users: "))
-    meetingcode = input("Enter meeting code (No Space): ")
-    passcode = input("Enter Password (No Space): ")
-
-    sec = 90
-    wait_time = sec * 60
-
-    with ThreadPoolExecutor(max_workers=number) as executor:
-        loop = asyncio.get_running_loop()
-        tasks = []
-        for i in range(number):
-            try:
-                # Generate a random Indian name using getindianname
-                user = name.randname()
-            except IndexError:
-                break
-            task = loop.create_task(start(f'[Thread{i}]', user, wait_time, meetingcode, passcode))
-            tasks.append(task)
-        try:
-            await asyncio.gather(*tasks)
-        except KeyboardInterrupt:
-            running = False
-            # Wait for tasks to complete
-            await asyncio.gather(*tasks, return_exceptions=True)
-
-if __name__ == '__main__':
-    try:
-        asyncio.run(main())
-    except KeyboardInterrupt:
-        pass
-
 
 
