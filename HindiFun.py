@@ -57,38 +57,51 @@ async def start(name, user, wait_time, meetingcode, passcode):
         print(f"{name} ended!")
 
         await browser.close()
-        
-async def main():
+import argparse
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
+
+# Your start() function and other necessary code here...
+
+def main():
     global running
-    number = int(input("Enter number of Users: "))
-    meetingcode = input("Enter meeting code (No Space): ")
-    passcode = input("Enter Password (No Space): ")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--users", type=int, help="5")
+    parser.add_argument("--meetingcode", type=str, help="82770760919")
+    parser.add_argument("--passcode", type=str, help="468111)")
+
+    args = parser.parse_args()
+
+    if args.users is None or args.meetingcode is None or args.passcode is None:
+        print("Missing required arguments. Please provide --users, --meetingcode, and --passcode.")
+        return
 
     sec = 90
     wait_time = sec * 60
 
-    with ThreadPoolExecutor(max_workers=number) as executor:
-        loop = asyncio.get_running_loop()
+    with ThreadPoolExecutor(max_workers=args.users) as executor:
+        loop = asyncio.get_event_loop()
         tasks = []
-        for i in range(number):
+        for i in range(args.users):
             try:
                 # Generate a random Indian name using getindianname
                 user = name.randname()
             except IndexError:
                 break
-            task = loop.create_task(start(f'[Thread{i}]', user, wait_time, meetingcode, passcode))
+            task = loop.create_task(start(f'[Thread{i}]', user, wait_time, args.meetingcode, args.passcode))
             tasks.append(task)
         try:
-            await asyncio.gather(*tasks)
+            loop.run_until_complete(asyncio.gather(*tasks))
         except KeyboardInterrupt:
             running = False
             # Wait for tasks to complete
-            await asyncio.gather(*tasks, return_exceptions=True)
+            loop.run_until_complete(asyncio.gather(*tasks, return_exceptions=True))
 
 if __name__ == '__main__':
     try:
-        asyncio.run(main())
+        main()
     except KeyboardInterrupt:
         pass
+
 
 
