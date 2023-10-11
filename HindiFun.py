@@ -4,6 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 from playwright.async_api import async_playwright
 import nest_asyncio
 import random
+import argparse
 import getindianname as name
 
 nest_asyncio.apply()
@@ -57,4 +58,75 @@ async def start(name, user, wait_time, meetingcode, passcode):
 
         await browser.close()
 
+async def main():
+    global running
+    number = int(input("Enter number of Users: "))
+    meetingcode = input("Enter meeting code (No Space): ")
+    passcode = input("Enter Password (No Space): ")
 
+    sec = 90
+    wait_time = sec * 60
+
+    with ThreadPoolExecutor(max_workers=number) as executor:
+        loop = asyncio.get_running_loop()
+        tasks = []
+        for i in range(number):
+            try:
+                # Generate a random Indian name using getindianname
+                user = name.randname()
+            except IndexError:
+                break
+            task = loop.create_task(start(f'[Thread{i}]', user, wait_time, meetingcode, passcode))
+            tasks.append(task)
+        try:
+            await asyncio.gather(*tasks)
+        except KeyboardInterrupt:
+            running = False
+            # Wait for tasks to complete
+            await asyncio.gather(*tasks, return_exceptions=True)
+
+if __name__ == '__main__':
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        pass
+
+def main():
+    global running
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--users", type=int, help="Number of Users")
+    parser.add_argument("--meetingcode", type=str, help="Meeting Code (No Space)")
+    parser.add_argument("--passcode", type=str, help="Password (No Space)")
+
+    args = parser.parse_args()
+
+    if args.users is None or args.meetingcode is None or args.passcode is None:
+        print("Missing required arguments. Please provide --users, --meetingcode, and --passcode.")
+        return
+
+    sec = 90
+    wait_time = sec * 60
+
+    with ThreadPoolExecutor(max_workers=args.users) as executor:
+        loop = asyncio.get_event_loop()
+        tasks = []
+        for i in range(args.users):
+            try:
+                # Generate a random Indian name using getindianname
+                user = name.randname()
+            except IndexError:
+                break
+            task = loop.create_task(start(f'[Thread{i}]', user, wait_time, args.meetingcode, args.passcode))
+            tasks.append(task)
+        try:
+            loop.run_until_complete(asyncio.gather(*tasks))
+        except KeyboardInterrupt:
+            running = False
+            # Wait for tasks to complete
+            loop.run_until_complete(asyncio.gather(*tasks, return_exceptions=True))
+
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        pass
