@@ -14,7 +14,6 @@ running = True
 
 async def start(user, wait_time, meetingcode, passcode):
     name = indian_names.get_full_name()  # Generate an Indian name using the indian_names library
-    print(f"{name} started!")
 
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True, args=['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'])
