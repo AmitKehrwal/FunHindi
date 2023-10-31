@@ -5,14 +5,15 @@ from playwright.async_api import async_playwright
 import nest_asyncio
 import random
 import argparse
-import getindianname as name
+import indian_names  # Import the indian_names library
 
 nest_asyncio.apply()
 
 # Flag to indicate whether the script is running
 running = True
 
-async def start(name, user, wait_time, meetingcode, passcode):
+async def start(user, wait_time, meetingcode, passcode):
+    name = indian_names.get_full_name()  # Generate an Indian name using the indian_names library
     print(f"{name} started!")
 
     async with async_playwright() as p:
@@ -57,7 +58,3 @@ async def start(name, user, wait_time, meetingcode, passcode):
         print(f"{name} ended!")
 
         await browser.close()
-
-
-
-
