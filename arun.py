@@ -1,5 +1,16 @@
-async def start(user, wait_time, meetingcode):
-    name = indian_names.get_full_name()  # Generate an Indian name using the indian_names library
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
+from playwright.async_api import async_playwright
+import nest_asyncio
+from faker import Faker
+
+nest_asyncio.apply()
+
+# Flag to indicate whether the script is running
+running = True
+
+async def start(name, user, wait_time, meetingcode):
+    print(f"{name} started!")
 
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True, args=['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'])
@@ -20,7 +31,7 @@ async def start(user, wait_time, meetingcode):
         try:
             await page.wait_for_selector('input[type="text"]', timeout=200000)
             await page.fill('input[type="text"]', user)
-            #await page.fill('input[type="password"]', passcode)
+            # Skip filling the password field
             join_button = await page.wait_for_selector('button.preview-join-button', timeout=200000)
             await join_button.click()
         except Exception as e:
@@ -43,3 +54,32 @@ async def start(user, wait_time, meetingcode):
         print(f"{name} ended!")
 
         await browser.close()
+
+async def main():
+    global running
+    number = int(input("Enter number of Users: "))
+    meetingcode = input("Enter meeting code (No Space): ")
+
+    sec = 90
+    wait_time = sec * 60
+
+    with ThreadPoolExecutor(max_workers=number) as executor:
+        loop = asyncio.get_running_loop()
+        tasks = []
+        fake = Faker('en_US')  # Specify 'en_US' locale for English names
+        for i in range(number):
+            user = fake.name()
+            task = loop.create_task(start(f'[Thread{i}]', user, wait_time, meetingcode))
+            tasks.append(task)
+        try:
+            await asyncio.gather(*tasks)
+        except KeyboardInterrupt:
+            running = False
+            # Wait for tasks to complete
+            await asyncio.gather(*tasks, return_exceptions=True)
+
+if __name__ == '__main__':
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        pass
