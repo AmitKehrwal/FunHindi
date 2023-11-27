@@ -42,12 +42,13 @@ async def start(thread_name, wait_time, meetingcode, passcode):
         pass
 
     try:
-        # Click the "Join Audio by Computer" button
-        join_audio_button = await page.waitForSelector('button[aria-label="Join Audio by Computer"]', timeout=400000)
+        # Wait for the "Join Audio by Computer" button to become visible
+        join_audio_button = await page.waitForXPath('//button[contains(text(), "Join Audio by Computer")]', timeout=400000)
         await join_audio_button.click()
         print(f"{thread_name} mic aayenge.")
     except Exception as e:
-        print(f"{thread_name} mic nahe aayenge.")
+        print(f"{thread_name} mic nahe aayenge. ", e)
+
 
     # ... (other code)
 
