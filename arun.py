@@ -9,17 +9,16 @@ subprocess.run(["pip", "install", "webdriver_manager"])
 # Upgrade webdriver_manager
 subprocess.run(["pip", "install", "--upgrade", "webdriver_manager"])
 
-# Install curl
-subprocess.run(["apt", "install", "curl"])
-
 # Download and add the Brave browser keyring
-subprocess.run(["curl", "-fsSLo", "/usr/share/keyrings/brave-browser-archive-keyring.gpg", "https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg"])
+subprocess.run(["wget", "-O", "/usr/share/keyrings/brave-browser-archive-keyring.gpg", "https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg"])
 
 # Add Brave browser repository to sources.list.d
-subprocess.run(["echo", "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main", "|", "sudo", "tee", "/etc/apt/sources.list.d/brave-browser-release.list"])
+repository_command = 'echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main" | sudo tee /etc/apt/sources.list.d/brave-browser-release.list'
+subprocess.run(repository_command, shell=True)
 
 # Update the package list
-subprocess.run(["apt", "update"])
+subprocess.run(["sudo", "apt", "update"])
 
 # Install Brave browser
-subprocess.run(["apt", "install", "brave-browser"])
+subprocess.run(["sudo", "apt", "install", "brave-browser"])
+
