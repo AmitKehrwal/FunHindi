@@ -1,18 +1,19 @@
 import asyncio
+import threading
 from concurrent.futures import ThreadPoolExecutor
 from playwright.async_api import async_playwright
 import nest_asyncio
 import random
 import argparse
-import getindianname as name  # Import the getindianname library
+import indian_names  # Import the indian_names library
 
 nest_asyncio.apply()
 
 # Flag to indicate whether the script is running
 running = True
 
-async def start(wait_time, meetingcode, passcode):
-    user = name.randname()  # Generate a random Indian name using getindianname
+async def start(user, wait_time, meetingcode, passcode):
+    name = indian_names.get_full_name()  # Generate an Indian name using the indian_names library
 
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True, args=['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'])
@@ -45,14 +46,14 @@ async def start(wait_time, meetingcode, passcode):
             mic_button_locator = await page.wait_for_selector(query, timeout=350000)
             await asyncio.sleep(10)
             await mic_button_locator.evaluate_handle('node => node.click()')
-            print(f"{user} mic aayenge.")
+            print(f"{name} mic aayenge.")
         except Exception as e:
-            print(f"{user} mic nahe aayenge. ", e)
+            print(f"{name} mic nahe aayenge. ", e)
 
-        print(f"{user} sleep for {wait_time} seconds ...")
+        print(f"{name} sleep for {wait_time} seconds ...")
         while running and wait_time > 0:
             await asyncio.sleep(1)
             wait_time -= 1
-        print(f"{user} ended!")
+        print(f"{name} ended!")
 
         await browser.close()
