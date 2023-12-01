@@ -37,7 +37,7 @@ async def start(thread_name, wait_time, meetingcode, passcode):
             await page.wait_for_selector('input[type="text"]', timeout=200000)
             await page.fill('input[type="text"]', user)
             await page.fill('input[type="password"]', passcode)
-            join_button = await page.wait_for_selector('button.preview-join-button', timeout=200000)
+            join_button = await page.wait_for_selector('button.preview-join-button', timeout=280000)
             await join_button.click()
         except Exception as e:
             pass
