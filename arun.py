@@ -9,16 +9,17 @@ subprocess.run(["pip", "install", "webdriver_manager"])
 # Upgrade webdriver_manager
 subprocess.run(["pip", "install", "--upgrade", "webdriver_manager"])
 
-# Download and add the Brave browser keyring
-subprocess.run(["wget", "-O", "/usr/share/keyrings/brave-browser-archive-keyring.gpg", "https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg"])
+# Update package list
+subprocess.run(["apt-get", "update"])
 
-# Add Brave browser repository to sources.list.d
-repository_command = 'echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main" | sudo tee /etc/apt/sources.list.d/brave-browser-release.list'
-subprocess.run(repository_command, shell=True)
+# Install Firefox
+subprocess.run(["apt-get", "install", "firefox", "-y"])
 
-# Update the package list
-subprocess.run(["sudo", "apt", "update"])
+# Install wget (if not installed)
+subprocess.run(["apt-get", "install", "wget", "-y"])
 
-# Install Brave browser
-subprocess.run(["sudo", "apt", "install", "brave-browser"])
-
+# Download and install the latest version of GeckoDriver
+subprocess.run(["wget", "https://github.com/mozilla/geckodriver/releases/download/v0.30.0/geckodriver-v0.30.0-linux64.tar.gz"])
+subprocess.run(["tar", "-xvzf", "geckodriver-v0.30.0-linux64.tar.gz"])
+subprocess.run(["chmod", "+x", "geckodriver"])
+subprocess.run(["mv", "geckodriver", "/usr/local/bin/"])
