@@ -5,7 +5,7 @@ from concurrent.futures import ThreadPoolExecutor
 from playwright.async_api import async_playwright
 import nest_asyncio
 import random
-import indian_names  # Change the import statement
+import indian_names
 
 nest_asyncio.apply()
 
@@ -13,13 +13,13 @@ nest_asyncio.apply()
 running = True
 
 async def start(thread_name, wait_time, meetingcode, passcode):
-    user = indian_names.get_full_name()  # Generate an Indian name using the Indian_names library
+    user = indian_names.get_full_name()
     print(f"{thread_name} started!")
 
     async with async_playwright() as p:
-        # Use Brave browser with specified executable path
-        browser = await p.chromium.launch(headless=True, args=['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'])
-        context = await browser.new_context(permissions=['microphone'])
+        # Use Firefox browser with specified executable path
+        browser = await p.firefox.launch(headless=True)
+        context = await browser.new_context()
         page = await context.new_page()
         await page.goto(f'https://zoom.us/wc/join/{meetingcode}', timeout=200000)
 
@@ -37,7 +37,7 @@ async def start(thread_name, wait_time, meetingcode, passcode):
             await page.wait_for_selector('input[type="text"]', timeout=200000)
             await page.fill('input[type="text"]', user)
             await page.fill('input[type="password"]', passcode)
-            join_button = await page.wait_for_selector('button.preview-join-button', timeout=280000)
+            join_button = await page.wait_for_selector('button.preview-join-button', timeout=200000)
             await join_button.click()
         except Exception as e:
             pass
@@ -69,8 +69,8 @@ async def main():
     sec = 90
     wait_time = sec * 60
 
-    # Set the correct path to the Brave browser executable
-    os.environ['BROWSER_PATH'] = "/usr/bin/brave-browser"
+    # Set the correct path to the Firefox executable
+    os.environ['FIREFOX_BIN'] = "/usr/bin/firefox"
 
     with ThreadPoolExecutor(max_workers=number) as executor:
         loop = asyncio.get_running_loop()
