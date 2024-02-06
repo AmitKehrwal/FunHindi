@@ -4,22 +4,35 @@ from concurrent.futures import ThreadPoolExecutor
 from playwright.async_api import async_playwright
 import nest_asyncio
 import random
-import argparse
-import indian_names  # Import the indian_names library
+import getindianname as name
 
 nest_asyncio.apply()
 
 # Flag to indicate whether the script is running
 running = True
 
+# Lock to make the print statements thread-safe
+print_lock = threading.Lock()
+
 async def start(user, wait_time, meetingcode, passcode):
-    name = indian_names.get_full_name()  # Generate an Indian name using the indian_names library
+    with print_lock:
+        print(f"{user} joined.")
 
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True, args=['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'])
-        context = await browser.new_context(permissions=['microphone'])
+        browser = await p.chromium.launch(
+            headless=True,
+            args=['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream']
+        )
+        context = await browser.new_context()
+
+        # Remove thread name from the user
+        user = user.split("_Thread")[0]
+
+        # Microphone permission for each thread
+        await context.grant_permissions(['microphone'])
+
         page = await context.new_page()
-        await page.goto(f'https://zoom.us/wc/join/{meetingcode}', timeout=200000)
+        await page.goto(f'http://app.zoom.us/wc/join/{meetingcode}', timeout=200000)
 
         try:
             await page.click('//button[@id="onetrust-accept-btn-handler"]', timeout=5000)
@@ -41,19 +54,20 @@ async def start(user, wait_time, meetingcode, passcode):
             pass
 
         try:
-            query = '//button[text()="Join Audio by Computer"]'
-            await asyncio.sleep(13)
-            mic_button_locator = await page.wait_for_selector(query, timeout=350000)
-            await asyncio.sleep(10)
+            await page.wait_for_selector('button.join-audio-by-voip__join-btn', timeout=300000)
+            query = 'button[class*=\"join-audio-by-voip__join-btn\"]'
+            # await asyncio.sleep(13)
+            mic_button_locator = await page.query_selector(query)
+            await asyncio.sleep(5)
             await mic_button_locator.evaluate_handle('node => node.click()')
             print(f"{name} mic aayenge.")
         except Exception as e:
             print(f"{name} mic nahe aayenge. ", e)
 
-        print(f"{name} sleep for {wait_time} seconds ...")
+        print(f"{user} sleep for {wait_time} seconds ...")
         while running and wait_time > 0:
             await asyncio.sleep(1)
             wait_time -= 1
-        print(f"{name} ended!")
+        print(f"{user} ended!")
 
         await browser.close()
