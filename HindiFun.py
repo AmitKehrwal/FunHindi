@@ -25,9 +25,6 @@ async def start(user, wait_time, meetingcode, passcode):
         )
         context = await browser.new_context()
 
-        # Remove thread name from the user
-        user = user.split("_Thread")[0]
-
         # Microphone permission for each thread
         await context.grant_permissions(['microphone'])
 
@@ -60,9 +57,9 @@ async def start(user, wait_time, meetingcode, passcode):
             mic_button_locator = await page.query_selector(query)
             await asyncio.sleep(5)
             await mic_button_locator.evaluate_handle('node => node.click()')
-            print(f"{name} mic aayenge.")
+            print(f"{user} mic aayenge.")
         except Exception as e:
-            print(f"{name} mic nahe aayenge. ", e)
+            print(f"{user} mic nahe aayenge. ", e)
 
         print(f"{user} sleep for {wait_time} seconds ...")
         while running and wait_time > 0:
